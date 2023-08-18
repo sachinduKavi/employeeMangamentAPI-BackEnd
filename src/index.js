@@ -1,33 +1,37 @@
 const express = require('express');
 
-const { getUserDetails, getAllEmployees, lastEMPid, addNewEmployee } = require('./controllers/employee_details');
-const { getAdminDetails, updateAccess    } = require('./controllers/admin_details');
+const employeeRouter = require('./routes/employee_details');
+const adminRouter = require('./routes/admin_details');
+const departmentRouter = require('./routes/department');
+const attendanceRouter = require('./routes/attendance');
+
 const PORT = 3000;  
 
 const {conn} = require('./db');
 const app = express();
 
 
+
 conn.connect(function(error){
     if(error) throw error;
-    console.log("Connected..");
+    console.log("Connected to database..");
 });
 
 // Fetching details about employees
-app.get('/employee_details/:user_email', getUserDetails);
-
-app.get('/employee_details/', getAllEmployees);
-
-app.get('/get_emp/', lastEMPid);
-
-app.post('/employee_details/add-employee/:empID/:fName/:lName/:email/:position/:department/:payRate/:nic/:mobileNumber/', addNewEmployee);
-
+app.use('/employee_details', employeeRouter);
 
 
 // Fetching from admin
-app.get('/admin/:user_email', getAdminDetails);
+app.use('/admin', adminRouter);
 
-app.put('/admin/:emp_id', updateAccess);
+
+// Fetching data from department
+app.use('/department', departmentRouter);
+
+
+// Fetching data from attendance
+app.use('/attendance', attendanceRouter);
+
 
 app.listen(PORT, () => {console.log("API is running...");});
 
